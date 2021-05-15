@@ -16,6 +16,27 @@ This is to certify that this project is my own work, based on my personal effort
    make sure to also include inline comments to discuss your
    algorithm.
 */
+
+//MAKE FUNC SPECS FOR THIS
+void getPhraseWord(strWord answer) {
+	
+	int j;
+	char ch;
+	
+	j = 0;
+	
+	do
+	{
+		scanf("%c", &ch);
+		if(ch != '\n') {
+			answer[j] = ch;
+			j++;
+		}
+		else
+			answer[j] = '\0';
+		
+	}while(ch != '\n');
+}
 void 
 FrequencyCount(int FC[], wordList aEntries, int n)
 {
@@ -281,6 +302,8 @@ int findMaxPrev(int A[], int prevMax[], int n, int nElemPrevMax)
 	return max;
 }
 
+
+
 /* Implement the functions listed in trivia.h here. 
    Read through the comments to know what the function is
    supposed to accomplish.  Note that the function names
@@ -335,9 +358,9 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 	int j;
 	int i;
 	int index;
-	int aIndexUsed[CAP];
-	int nElemIU;
-	int FC[52];
+	int aIndexUsed[CAP]; //array of used/already checked indices, used to check if a word has been checked already
+	int nElemIU; //the amount of elements in aIndexUsed
+	int FC[52]; 
 	int bFound;
 	int max;
 	char prioCh;
@@ -354,8 +377,8 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 	
 	FrequencyCount(FC, aEntries, nElem);
 	
-	for(j = 0; j < 52; j++)
-		printf("Index %d: %d\n", j, FC[j]);
+	//for(j = 0; j < 52; j++)
+	//	printf("Index %d: %d\n", j, FC[j]);
 	
 	count = 0;
 	
@@ -384,7 +407,7 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 			else
 					prioCh = max + 71;
 				
-			printf("prio char: **%c**\n",prioCh );
+			//printf("prio char: **%c**\n",prioCh );
 			
 			for(i = 0; i < nCols; i++) {
 				
@@ -394,6 +417,8 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 				
 				while(bFound == 0 && !isAllUsed(aEntries, nElem)) {
 					
+					//randomly generates a number within the range of aEntries that can possibly be the index of chosen word 
+					//that will fill the spot
 					index = getRandom(0, nElem - 1);
 					
 					if(aEntries[index].use == 0 && Search(gameboard[j], nCols, aEntries[index].answer[0]) == -1 && aEntries[index].answer[0] == prioCh) {
@@ -406,15 +431,19 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 					}
 					else if(SearchInt(aIndexUsed, nElemIU, index) == -1)           
 					{
-						
+						/*Adds index to already checked indexes in aEntries if it is not already in the array */
 						aIndexUsed[nElemIU] = index;
 						nElemIU++;
 						
 						
 						
-						//break the loop and move on to the next row or spot
+						
 					}
 					
+					
+					/*If all possible unused entries have been checked and still can't find a wordto fill the particular
+					spot in the matrix, stop the loop and move on to next row or spot. Prevents infinite loop if
+					game can not be initialized*/
 					if(nElemIU == nElem)
 							bFound = 1;
 					
@@ -426,7 +455,7 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 				u++;
 				max = findMaxPrev(FC, prevMax, 52, nElemPrevMax);
 				
-				printf("max: (found with findMaxPrev) **%d**", max);
+				//printf("max: (found with findMaxPrev) **%d**", max);
 				
 				if(max >= 0 && max <= 25) {
 					prioCh = max + 'A';
@@ -434,16 +463,16 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 				else
 					prioCh = max + 71;
 				
-				printf("prio char: **%c**\n",prioCh );
+				//printf("prio char: **%c**\n",prioCh );
 				
 			}
-	}
+		}
 	
 	
 	//PRINT CODE
-	printf("\n\nAFTER: \n");
-	for(j = 0; j < 52; j++)
-		printf("Index %d: %d\n", j, FC[j]);
+	//printf("\n\nAFTER: \n");
+	//for(j = 0; j < 52; j++)
+	//	printf("Index %d: %d\n", j, FC[j]);
 	
 	
 	if(count == target_count)
@@ -598,7 +627,7 @@ addWord(wordList aEntries, int * pElem)
 		
 		bValid = 1;
 		printf("\nPlease enter the word you would like to add: ");
-		scanf("%s", answer);
+		getPhraseWord(answer);
 		
 		fflush(stdin);
 		
@@ -613,7 +642,7 @@ addWord(wordList aEntries, int * pElem)
 			bValid = 0;
 		}
 		
-		if(bValid == 1) {
+		if(bValid == 1 && *pElem < CAP) {
 		
 			do {
 				printf("\nWould you like to enter another WORD? Please enter [Y] if yes and [N] if you would like to stop.\n");
@@ -624,11 +653,20 @@ addWord(wordList aEntries, int * pElem)
 				
 			}while(!bIsYN(ch));
 		}
+		
+
+		
+		
 	}
+	
+	if(*pElem == CAP)
+			printf("\nYou have reached the max amount of words and can no longer add any more words.\n");
 	
 	
 	
 }
+
+
 
 /* This function will ask the user for the relation and
    relation value as store it in the clueList member field
@@ -731,6 +769,74 @@ addTrivia(struct triviaTag * oneEntry)
 		}
 	}
 }
+void getPhraseRelValue(struct triviaTag * oneEntry, int clueChoice)
+{
+	int j;
+	char ch;
+
+	do
+	{
+		j = 0;
+		do
+		{			
+			scanf("%c", &ch);
+					
+			if(ch != '\n') {
+
+				(*oneEntry).clueList[clueChoice - 1].relValue[j] = ch;
+				j++;
+			}		
+			else
+				(*oneEntry).clueList[clueChoice - 1].relValue[j] = '\0';
+					
+				
+						
+					
+		}while(ch != '\n' || j == 0);
+		
+		if(!isLetter((*oneEntry).clueList[clueChoice - 1].relValue[0]))
+				printf("\nInvalid input, first character must be in the alphabet, please enter again: ");
+			
+	}while(!isLetter((*oneEntry).clueList[clueChoice - 1].relValue[0]));
+	
+}
+/*
+	MAKE FUNC SPECS
+
+*/
+void getPhraseRelation(struct triviaTag * oneEntry, int clueChoice)
+{
+	
+	int j;
+	char ch;
+
+	do
+	{
+		j = 0;
+		do
+		{			
+			scanf("%c", &ch);
+					
+			if(ch != '\n') {
+
+				(*oneEntry).clueList[clueChoice - 1].relation[j] = ch;
+				j++;
+			}		
+			else
+				(*oneEntry).clueList[clueChoice - 1].relation[j] = '\0';
+					
+				
+						
+					
+		}while(ch != '\n' || j == 0);
+		
+		if(!isLetter((*oneEntry).clueList[clueChoice - 1].relation[0]))
+				printf("\nInvalid input, first character must be in the alphabet, please enter again: ");
+			
+	}while(!isLetter((*oneEntry).clueList[clueChoice - 1].relation[0]));
+}
+//MY OWN FUNCS, put it up there maybe after
+
 
 /* This function will ask the user for which part of the
    information in *oneEntry that will be modified (word or
@@ -748,6 +854,120 @@ addTrivia(struct triviaTag * oneEntry)
 void 
 modifyEntry(struct triviaTag * oneEntry)
 {
+	int i, clueChoice;
+	int choice;
+	
+	 
+			
+	printf("\nLIST OF CLUES: \n");
+			
+	for(i = 0; i < oneEntry->numClues; i++) {
+				
+		printf("[%d] %s: %s",i + 1,  oneEntry->clueList[i].relation,  oneEntry->clueList[i].relValue);
+		printf("\n");
+	}
+			
+	do
+	{
+		printf("\nPlease enter the number of the clue you would like to modify: ");
+		scanf("%d", &choice);
+	}while(!(choice >= 1 && choice <= oneEntry->numClues));
+			
+	clueChoice = choice;
+				
+	printf("\nWhich part of the clue would you like to modify?\n");
+	printf("[1]Relation\n[2]Relation Value\n[3]Both Relation and Relation Value\n");
+			
+	printf("Please enter your choice: ");
+			
+	do
+	{
+		scanf("%d", &choice);
+				
+	}while(!(choice >= 1 && choice <= 3));
+			
+	switch(choice) {
+		case 1:
+		{
+					
+			printf("Please enter the new relation: ");
+			getPhraseRelation(oneEntry, clueChoice);
+			break;
+					
+		}
+		case 2:
+		{
+			printf("Please enter the new relation value: ");
+			getPhraseRelValue(oneEntry, clueChoice);
+			break;
+					
+		}
+				case 3:
+		{
+			printf("Please enter the new relation: ");
+			getPhraseRelation(oneEntry, clueChoice);
+					
+			printf("Please enter the new relation value: ");
+			getPhraseRelValue(oneEntry, clueChoice);
+			break;
+					
+		}
+	}
+			
+			
+	
+	
+	
+}
+
+//MAKE FUNC SPECS
+void modifyEntryChoice(struct triviaTag * oneEntry, wordList aEntries, int nElem) {
+	
+	int bInput = 1;
+	int choice;
+	
+	char cDump;
+	int res;
+	strWord repWord;
+	
+	while(bInput == 1) {
+		
+		printf("\n[1]Modify Word\n[2]Modify Clue\n[3]Exit\n");
+	
+		
+		do
+		{
+			printf("\nPlease enter the number of your next action: ");
+			scanf("%d%c", &choice, &cDump);
+			
+		}while(!(choice >= 1 && choice <= 3));
+		
+		if(choice == 1) {
+			printf("\nPlease enter the new word: "); 
+			do
+			{
+				getPhraseWord(repWord);
+				
+				res = searchWord(repWord, aEntries, nElem);
+				
+				
+				if(res != -1) 
+					printf("\nThe word you entered already exists, please enter a new word.\n");
+				
+				
+			}while(res != -1);
+			
+			
+			
+			strcpy(oneEntry->answer, repWord);
+			printf("The word has been successfully replaced: %s", oneEntry->answer);
+		} else if (choice == 2) {
+			
+			modifyEntry(oneEntry);
+		} else if (choice == 3)
+			bInput = 0;
+	
+	}
 }
 
 /* This function will ask the user to input the word (or phrase)
@@ -763,6 +983,73 @@ modifyEntry(struct triviaTag * oneEntry)
 void 
 deleteWord(wordList aEntries, int *pElem)
 {
+	int j;
+	
+	
+}
+
+int isValidXPN(char ch)
+{
+	if(ch == 'P' || ch == 'X' || ch == 'N')
+		return 1;
+	else return 0;
+}
+int isValidXP(char ch)
+{
+	if(ch == 'P' || ch == 'X')
+		return 1;
+	else return 0;
+}
+int isValidXN(char ch)
+{
+	if(ch == 'X' || ch == 'N')
+		return 1;
+	else return 0;
+}
+char inputViewWords(int i, int nElem)
+{
+	char ch, cDump;
+	
+	if (nElem == 1) {
+		
+		do
+		{
+			printf("\nThis is the only word in the game. Press [X] if you would like to exit: ");
+			scanf("%c%c", &ch, &cDump);
+			
+		}while(ch != 'X');
+	
+	} else if (i > 0 && i < nElem - 1) {
+		
+		do
+		{
+			printf("\nEnter [N] if you would like to view the next entry, and [P] to view the previous entry, and [X] to exit: ");
+			scanf("%c%c", &ch, &cDump);
+			
+			
+		}while(!isValidXPN(ch));
+		
+	} else if (i == 0) {
+		
+		do
+		{		
+			printf("\nEnter [N] if you would like to view the next entry, or [X] if you would like to exit: ");
+			scanf("%c%c", &ch, &cDump);
+			
+		}while(!isValidXN(ch));	
+	} else {
+	
+		
+		do
+		{		
+			printf("\nThis is the last entry. Enter [P] if you would like to go to the previous entry, or [X] to exit: ");
+			scanf("%c%c", &ch, &cDump);
+			
+		}while(!isValidXP(ch));	
+	
+	}
+	
+	return ch;
 }
 
 /* This function displays all information per element in aEntries.
@@ -775,6 +1062,33 @@ deleteWord(wordList aEntries, int *pElem)
 void 
 viewWords(wordList aEntries, int nElem)
 {
+	int bView = 1;
+	int i;
+	char ch;
+	
+	
+	i = 0;
+	
+	while(bView == 1 && nElem > 0) {
+		
+		printf("\nEntry #%d: ", i + 1);
+		
+		viewEntry(aEntries[i]);
+		
+		ch = inputViewWords(i, nElem);
+		
+		if(ch == 'X')
+			bView = 0;
+		else if (ch == 'N')
+			i++;
+		else 
+			i--;
+		
+		
+	}
+	
+	if(nElem == 0)
+		printf("\nThere are no words to view, please import/enter some words to add to the game. \n");
 }
 
 /* This function displays all information in entry.
@@ -809,6 +1123,38 @@ displayAllClues(arrClues aList, int numClues)
 	}
 }
 
+/* 
+		MAKE FUNC SPECS FOR THIS
+		
+
+*/
+void viewClues(wordList aEntries, int nElem)
+{
+	
+	strWord input;
+	int res;
+	
+	printf("\nLIST OF WORDS: \n");
+	listWords(aEntries, nElem);
+	
+	do
+	{
+		printf("\n\nPlease enter the word you would like to view the clues of: ");
+		getPhraseWord(input);
+		
+		res = searchWord(input, aEntries, nElem);
+		
+	if(res == -1)
+		printf("\nThe word you entered does not exist in the list, please enter a word that is in the list above.");
+	}while(res == -1);
+	
+	fflush(stdin);
+	
+	viewEntry(aEntries[res]);
+	
+	
+}
+
 /* Given the filename stored in fname, this function
    overwrites the contents of the text file with the contents 
    if the array aEntries. Contents of aEntries and nElem will 
@@ -821,6 +1167,7 @@ displayAllClues(arrClues aList, int numClues)
 void
 export(strWord fname, wordList aEntries, int nElem)
 {
+	
 }
 
 /* This function sorts the contents of aEntries in increasing
@@ -834,6 +1181,33 @@ export(strWord fname, wordList aEntries, int nElem)
 void 
 sortEntries(wordList aEntries, int nElem)
 {
+	int i;
+	int j;
+	int min;
+	strWord temp;
 	
+	if(nElem > 0) {
+		
+		for(i = 0; i < nElem - 1; i++) {
+			
+			min = i;
+			
+			for(j = i + 1; j < nElem; j++) {
+				
+				
+				
+				if(strcmp(aEntries[min].answer, aEntries[j].answer) > 0) {
+					
+					min = j;
+					
+				}
+				
+			}
+			
+			strcpy(temp, aEntries[i].answer);
+			strcpy(aEntries[i].answer, aEntries[min].answer);
+			strcpy(aEntries[min].answer, temp);
+		}
+	}
 	
 }

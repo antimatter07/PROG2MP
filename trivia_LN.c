@@ -984,9 +984,34 @@ void
 deleteWord(wordList aEntries, int *pElem)
 {
 	int j;
+
+	strWord rep;
 	
+	int res = -1;
+
+
+	while(res == -1) {
+
+		printf("Please enter the word that you wish to delete: ");
+
+		getPhraseWord(rep);
+
+		res = searchWord(rep, aEntries, *pElem);
+
+		if(res == -1) {
+			printf("\nThe word does not exist, please enter a word that is in the game.\n");
+
+		}
+	}
+
+	--*pElem;
+
+	for(j = res; j < *pElem ; j++) 
+		aEntries[j] = aEntries[j + 1];
 	
 }
+
+
 
 int isValidXPN(char ch)
 {
@@ -1101,7 +1126,7 @@ viewWords(wordList aEntries, int nElem)
 void
 viewEntry(struct triviaTag entry)
 {
-	printf("%s\n", entry.answer);
+	printf("WORD: %s\n", entry.answer);
 	displayAllClues(entry.clueList, entry.numClues);
 	
 	
@@ -1117,8 +1142,9 @@ displayAllClues(arrClues aList, int numClues)
 {
 	int i;
 	
+	printf("\nLIST OF CLUES: \n");
 	for(i = 0; i < numClues; i++) {
-		printf("%s: %s", aList[i].relation, aList[i].relValue);
+		printf("[%d] %s: %s", i + 1, aList[i].relation, aList[i].relValue);
 		printf("\n");
 	}
 }
@@ -1153,6 +1179,51 @@ void viewClues(wordList aEntries, int nElem)
 	viewEntry(aEntries[res]);
 	
 	
+}
+
+/*Make func specs */
+void 
+deleteClue(wordList aEntries, int nElem)
+{
+	int res = -1;
+	int choice, j;
+	strWord word;
+
+	while(res == -1) {
+		printf("\nPlease enter the word whose clue/s you would like to delete: ");
+		getPhraseWord(word);
+
+		res = searchWord(word, aEntries, nElem);
+
+		if(res == -1)
+		printf("\nThe word does not exist, please enter another word.\n");
+	}
+
+	printf("\n");
+
+	if(aEntries[res].numClues > 1) {
+		viewEntry(aEntries[res]);
+		
+		do
+		{
+			printf("\nPlease enter the number of the clue you would like to delete: ");
+			scanf("%d", &choice);
+		}while(!(choice >= 1 && choice <= aEntries[res].numClues));
+
+		choice--;
+
+		aEntries[res].numClues--;
+
+		for(j = choice; j < aEntries[res].numClues; j++) {
+			aEntries[res].clueList[j] = aEntries[res].clueList[j + 1];
+		}
+	} else {
+
+		printf("\nUnable to delete any clues for this word since this word only has one clue.");
+		printf("You may only modify or add clues to this word.\n");
+
+	}
+
 }
 
 /* Given the filename stored in fname, this function

@@ -491,6 +491,8 @@ import(strWord fname, wordList aEntries, int * pElem)
 			tempTrivia.clueList[j].relValue[0]= '\0';
 		}
 
+		
+
 	
 		
 	
@@ -500,6 +502,8 @@ import(strWord fname, wordList aEntries, int * pElem)
 		
 		
 	}
+
+	fclose(fp);
 
 
 	/*
@@ -513,12 +517,6 @@ import(strWord fname, wordList aEntries, int * pElem)
 
 	3.) do this until two newlines are encountered and a word is not present, in other words EOF
 	*/
-
-
-
-
-
-
 
 }
 
@@ -1425,6 +1423,25 @@ deleteClue(wordList aEntries, int nElem)
 void
 export(strWord fname, wordList aEntries, int nElem)
 {
+	FILE* fp;
+	int j;
+	int i;
+
+	fp = fopen(fname, "wt");
+
+	for(j = 0; j < nElem; j++) {
+
+		fprintf(fp, "Object: %s\n", aEntries[j].answer);
+
+		for(i = 0; i < aEntries[j].numClues; i++) {
+			fprintf(fp, "%s: %s\n", aEntries[j].clueList[i].relation, aEntries[j].clueList[i].relValue);
+		}
+		fprintf(fp, "\n");
+
+	}
+
+	fclose(fp);
+
 	
 }
 

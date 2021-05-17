@@ -1,5 +1,10 @@
 /********************************************************************************************************* 
-This is to certify that this project is my own work, based on my personal efforts in studying and applying the concepts learned. I have constructed the functions and their respective algorithms and corresponding code by myself. The program was run, tested, and debugged by my own efforts. I further certify that I have not copied in part or whole or otherwise plagiarized the work of other students and/or persons.
+This is to certify that this project is my own work, based on my personal efforts in studying and applying
+ the concepts learned. 
+I have constructed the functions and their respective algorithms and corresponding code by myself. 
+The program was run, tested, and debugged by my own efforts. 
+I further certify that I have not copied in part or whole or otherwise plagiarized the work of other 
+students and/or persons.
  Matthew James D. Villarica, DLSU ID 12049476 
 *********************************************************************************************************/
 
@@ -333,6 +338,164 @@ int findMaxPrev(int A[], int prevMax[], int n, int nElemPrevMax)
 void
 import(strWord fname, wordList aEntries, int * pElem)
 {
+	FILE *fp;
+	int j;
+	char ch;
+	
+	int res = 1;
+	
+	int newlineCount;
+	struct triviaTag tempTrivia;
+
+	if((fp = fopen(fname, "rt")) == NULL) {
+		fprintf(stderr, "ERROR: %s does not exist.\n", fname);
+	}
+
+	
+	
+	while(res != EOF) {
+
+		
+
+		tempTrivia.numClues = 0;
+		
+		//SKIP THE WORD BEFORE FIRST COLON
+		do {
+
+			fscanf(fp, "%c", &ch);
+
+		}while(ch != ':');
+
+		//After first colon, get phrase for answer
+		j = 0;
+		fscanf(fp, "%c", &ch); //catch the additional space after colon.
+
+		do {
+			fscanf(fp, "%c", &ch);
+
+			if(ch != '\n') {
+				tempTrivia.answer[j] = ch;
+				j++;
+			}
+			else
+				tempTrivia.answer[j] = '\0';
+		}while(ch != '\n');
+
+
+
+		//GETTING OF CLUES 
+		//After newline, get phrase relation
+
+		newlineCount = 0;
+
+		do {
+			if(newlineCount > 0)
+				j = 1;
+			else
+				j = 0;
+
+			newlineCount = 0;
+
+			do {
+				fscanf(fp, "%c", &ch);
+
+				if(ch != ':') {
+					tempTrivia.clueList[tempTrivia.numClues].relation[j] = ch;
+					j++;
+				}
+				else
+					tempTrivia.clueList[tempTrivia.numClues].relation[j] = '\0';
+			}while(ch != ':');
+
+
+			fscanf(fp, "%c", &ch); //catch additional space after colon
+
+		//After colon and single space, get phrase relValue
+
+			j = 0;
+			do {
+				fscanf(fp, "%c", &ch);
+
+				if(ch != '\n') {
+					tempTrivia.clueList[tempTrivia.numClues].relValue[j] = ch;
+					j++;
+				}
+				else {
+					tempTrivia.clueList[tempTrivia.numClues].relValue[j] = '\0';
+					newlineCount++;
+				}
+			}while(ch != '\n');
+
+			
+			/*Counts amount of newlines. If its only 1, the next char is a phrase rel. 
+			If it's two newlines, it can be the next word or EOF. Assigns the first char
+			of the next clue to proper string in list. */
+			do {
+
+				res = fscanf(fp, "%c", &ch);
+			
+				if(ch == '\n')
+					newlineCount++;
+				else if(newlineCount == 1 && res != EOF)/*If it is not another newline, then ch contains the first letter of the next relation of the current word */
+					tempTrivia.clueList[tempTrivia.numClues + 1].relation[0] = ch;
+				
+			}while(ch == '\n' && res != EOF);
+
+			//printf("\n%d %s: %s\n",tempTrivia.numClues, tempTrivia.clueList[tempTrivia.numClues].relation,tempTrivia.clueList[tempTrivia.numClues].relValue);
+			
+			//printf("newline count: %d\n", newlineCount);
+
+			//fprintf(stdout, "res: %d\n", res);
+			
+			
+			//printf("\n%c", tempTrivia.clueList[tempTrivia.numClues + 1].relation[0]);
+
+			tempTrivia.numClues++;
+
+		} while(newlineCount == 1);
+
+	
+		aEntries[*pElem] = tempTrivia;
+		++*pElem;
+
+
+		//To reuse temp, reinitialize all strings to null
+		tempTrivia.answer[0] = '\0';
+
+		for(j = 0; j < tempTrivia.numClues; j++) {
+			tempTrivia.clueList[j].relation[0] = '\0';
+			tempTrivia.clueList[j].relValue[0]= '\0';
+		}
+
+	
+		
+	
+		//if((fscanf(fp, "%c", &ch)) == 0)
+		//	bInput = 0;
+		
+		
+		
+	}
+
+
+	/*
+
+	PSEUDO CODE
+	1.) get the first word, which is the very first word after the first colon + space, and  every
+	after two newlines, the word after the first colon + space.
+
+	2.) after every colon and 1 space (aside from the answer) is a relation value, after every single
+		newline (only 1 newline) is a relation
+
+	3.) do this until two newlines are encountered and a word is not present, in other words EOF
+	*/
+
+
+
+
+
+
+
 }
 
 /* This function initializes the gameboard with nRows by

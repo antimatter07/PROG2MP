@@ -341,9 +341,10 @@ import(strWord fname, wordList aEntries, int * pElem)
 	FILE *fp;
 	int j;
 	char ch;
-	
+	int index;
 	int res = 1;
-	
+	char input;
+	char cDump;
 	int newlineCount;
 	struct triviaTag tempTrivia;
 
@@ -364,6 +365,8 @@ import(strWord fname, wordList aEntries, int * pElem)
 
 			fscanf(fp, "%c", &ch);
 
+			
+
 		}while(ch != ':');
 
 		//After first colon, get phrase for answer
@@ -381,11 +384,23 @@ import(strWord fname, wordList aEntries, int * pElem)
 				tempTrivia.answer[j] = '\0';
 		}while(ch != '\n');
 
+		//Checking of duplicates
+		index = searchWord(tempTrivia.answer, aEntries, *pElem);
+		if(index != -1) {
+
+			do 
+			{
+				fprintf(stdout,"The word %s already exists in the entries. Would you like to replace the data for the word with the contents of the text file?\nEnter [Y] to overwrite the data and [N] to retain the data: ", tempTrivia.answer);
+
+				fscanf(stdin, "%c%c", &input, &cDump);
 
 
+			
+			}while(!(input == 'Y' || input == 'y' || input == 'n' || input == 'N'));
+		}
 		//GETTING OF CLUES 
 		//After newline, get phrase relation
-
+		
 		newlineCount = 0;
 
 		do {
@@ -454,9 +469,18 @@ import(strWord fname, wordList aEntries, int * pElem)
 
 		} while(newlineCount == 1);
 
-	
-		aEntries[*pElem] = tempTrivia;
-		++*pElem;
+		if(index != -1) {
+
+			if(input == 'Y' || input == 'y')
+				aEntries[index] = tempTrivia;
+			
+		}
+		else {
+			
+			aEntries[*pElem] = tempTrivia;
+			++*pElem;
+		}
+		
 
 
 		//To reuse temp, reinitialize all strings to null

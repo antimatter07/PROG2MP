@@ -1,0 +1,77 @@
+Object: Alchohol
+Use: Sanitization
+
+Object: Apple
+Kind of: Nutruitous Snack
+Color: Red
+Flavor: Sweet
+Texture: Crunchy
+
+Object: Cable
+kind of: wifi
+
+Object: New Picture Frame
+Size: Very Big
+Make: Wood, Aluminum, Plastic, Glass
+Color: Assorted
+Height: Inch
+Width: Inch
+Contains: Picture
+
+Object: Nintendo
+kind of: game company
+
+Object: Picture Frame
+Kind of: Home Decor
+Make: Wood, Aluminum, Plastic, Glass
+Color: Assorted
+Height: Inch
+Width: Inch
+Contains: Picture
+
+Object: Sharpener
+Color: Blue
+Use: For Maintaining Pencils
+Size: Small
+
+Object: Table
+Kind of: Furniture
+Part: Top
+Part: Leg
+Height: Meter
+Make: Wood, Plastic
+Color: Brown, White, Black
+
+Object: Towel
+Use: Drying
+Color: Brown
+Pattern: Floral
+
+Object: Tripod
+Use: For My Phone
+Color: Black, Silver, Gray
+
+Object: Yellow Notepad
+use: school supply
+color: yellow
+
+Object: Zebra
+Kind of: Horse
+Pattern: Black and White Stripes
+
+Object: bacon
+kind of: breakfast
+
+Object: cat
+kind of: animal
+has a: track wheel
+
+Object: pen
+use: writing
+
+Object: scientific calculatoruse
+use: school calculations
+
+Object: speaker
+color: yellow
+

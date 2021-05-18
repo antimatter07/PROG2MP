@@ -1,4 +1,4 @@
-#include "trivia_LN.c"  //modify this to reflect the filename that you used for your solution.
+#include "trivia_VILLARICA.c"  //modify this to reflect the filename that you used for your solution.
 #include<stdlib.h> //including this header file for rand() and srand()
 
 int
@@ -20,7 +20,7 @@ main()
      printf("Main Menu\n");
      printf("1 - Game Phase\n");
      printf("2 - Maintenance Phase\n");
-	 printf("3 - Exit\n");
+	   printf("3 - Exit\n");
     
      scanf("%d%c", &opt, &cDump);
    
@@ -32,12 +32,12 @@ main()
 		           scanf("%d", &nRows);
 				       printf("How many columns for the board? ");
 		           scanf("%d%c", &nCols, &cDump);
+                
+               printf("Enter filename for source of trivia: ");
+               scanf("%s", fname);
+               import(fname, aEntries, &nElem);
 				   
-				   printf("Enter filename for source of trivia: ");
-				   scanf("%s", fname);
-				   import(fname, aEntries, &nElem);
-				   
-				   test = initBoard(gameboard, nRows, nCols, aEntries, nElem);
+				       test = initBoard(gameboard, nRows, nCols, aEntries, nElem);
                  } while (test == 0 || !(nRows > 0 && nRows <= 10) ||
 				         !(nCols > 0 && nCols <= 10));
 				 play(gameboard, nRows, nCols, aEntries, nElem);

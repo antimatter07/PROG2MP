@@ -42,6 +42,56 @@ void getPhraseWord(strWord answer) {
 		
 	}while(ch != '\n');
 }
+
+//MAKE FUNC SPECS
+void modifyEntryChoice(struct triviaTag * oneEntry, wordList aEntries, int nElem) {
+	
+	int bInput = 1;
+	int choice;
+	
+	char cDump;
+	int res;
+	strWord repWord;
+	
+	while(bInput == 1) {
+		
+		printf("\n[1]Modify Word\n[2]Modify Clue\n[3]Exit\n");
+	
+		
+		do
+		{
+			printf("\nPlease enter the number of your next action: ");
+			scanf("%d%c", &choice, &cDump);
+			
+		}while(!(choice >= 1 && choice <= 3));
+		
+		if(choice == 1) {
+			printf("\nPlease enter the new word: "); 
+			do
+			{
+				getPhraseWord(repWord);
+				
+				res = searchWord(repWord, aEntries, nElem);
+				
+				
+				if(res != -1) 
+					printf("\nThe word you entered already exists, please enter a new word.\n");
+				
+				
+			}while(res != -1);
+			
+			
+			
+			strcpy(oneEntry->answer, repWord);
+			printf("The word has been successfully replaced: %s", oneEntry->answer);
+		} else if (choice == 2) {
+			
+			modifyEntry(oneEntry);
+		} else if (choice == 3)
+			bInput = 0;
+	
+	}
+}
 void 
 FrequencyCount(int FC[], wordList aEntries, int n)
 {
@@ -130,6 +180,25 @@ int findMax(int A[], int n)
 	return max;
 }
 
+void printGB(arrMatrix gameboard, int nRows, int nCols)
+{
+	
+	int j, i;
+	printf("\n");
+	
+	for(j = 0; j < nRows; j++) {
+		for(i = 0; i < nCols; i++) {
+			
+			printf("%c ", gameboard[j][i]);
+			
+			
+		}
+		printf("\n");
+	}
+	
+	
+}
+
 int isLetter(char c)
 {
 	
@@ -167,6 +236,51 @@ int countChar(char row[], int nCols, char key)
 	
 	return count;
 	
+}
+
+/*Make func specs */
+void 
+deleteClue(wordList aEntries, int nElem)
+{
+	int res = -1;
+	int choice, j;
+	strWord word;
+
+	while(res == -1) {
+		printf("\nPlease enter the word whose clue/s you would like to delete: ");
+		getPhraseWord(word);
+
+		res = searchWord(word, aEntries, nElem);
+
+		if(res == -1)
+		printf("\nThe word does not exist, please enter another word.\n");
+	}
+
+	printf("\n");
+
+	if(aEntries[res].numClues > 1) {
+		viewEntry(aEntries[res]);
+		
+		do
+		{
+			printf("\nPlease enter the number of the clue you would like to delete: ");
+			scanf("%d", &choice);
+		}while(!(choice >= 1 && choice <= aEntries[res].numClues));
+
+		choice--;
+
+		aEntries[res].numClues--;
+
+		for(j = choice; j < aEntries[res].numClues; j++) {
+			aEntries[res].clueList[j] = aEntries[res].clueList[j + 1];
+		}
+	} else {
+
+		printf("\nUnable to delete any clues for this word since this word only has one clue.");
+		printf("You may only modify or add clues to this word.\n");
+
+	}
+
 }
 /*
 	This function uses linear search to look for the key in a 1D array of integers and 
@@ -307,6 +421,63 @@ int findMaxPrev(int A[], int prevMax[], int n, int nElemPrevMax)
 	return max;
 }
 
+/* 
+		MAKE FUNC SPECS FOR THIS
+		
+
+*/
+void viewClues(wordList aEntries, int nElem)
+{
+	
+	strWord input;
+	int res;
+	
+	printf("\nLIST OF WORDS: \n");
+	listWords(aEntries, nElem);
+	
+	do
+	{
+		printf("\n\nPlease enter the word you would like to view the clues of: ");
+		getPhraseWord(input);
+		
+		res = searchWord(input, aEntries, nElem);
+		
+	if(res == -1)
+		printf("\nThe word you entered does not exist in the list, please enter a word that is in the list above.");
+	}while(res == -1);
+	
+	fflush(stdin);
+	
+	viewEntry(aEntries[res]);
+	
+	
+}
+
+int isValidLetter(char ch, char gameRow[], int nCols) 
+{
+	int j;
+	int bFound = 0;
+	
+	int index;
+	j = 0;
+
+	while(bFound == 0 && j < nCols) {
+		if(ch == gameRow[j]) {
+			index = j;
+			bFound = 1;
+		}
+		j++;
+	}
+
+	if(bFound == 0)
+		return -1;
+	else
+		return index;
+
+
+
+}
+
 
 
 /* Implement the functions listed in trivia.h here. 
@@ -354,13 +525,13 @@ import(strWord fname, wordList aEntries, int * pElem)
 
 	
 	
-	while(res != EOF) {
+	while(res != EOF && fp != NULL) {
 
 		
 
 		tempTrivia.numClues = 0;
 		
-		//SKIP THE WORD BEFORE FIRST COLON
+		//skips the word before first colon, usually "Object:"
 		do {
 
 			fscanf(fp, "%c", &ch);
@@ -388,16 +559,20 @@ import(strWord fname, wordList aEntries, int * pElem)
 		index = searchWord(tempTrivia.answer, aEntries, *pElem);
 		if(index != -1) {
 
+			fflush(stdin);
+
 			do 
 			{
+				
 				fprintf(stdout,"The word %s already exists in the entries. Would you like to replace the data for the word with the contents of the text file?\nEnter [Y] to overwrite the data and [N] to retain the data: ", tempTrivia.answer);
-
+				fflush(stdin);
 				fscanf(stdin, "%c%c", &input, &cDump);
 
 
 			
 			}while(!(input == 'Y' || input == 'y' || input == 'n' || input == 'N'));
 		}
+
 		//GETTING OF CLUES 
 		//After newline, get phrase relation
 		
@@ -503,7 +678,10 @@ import(strWord fname, wordList aEntries, int * pElem)
 		
 	}
 
+	fflush(stdin);
+
 	fclose(fp);
+	
 
 
 	/*
@@ -559,6 +737,13 @@ initBoard(arrMatrix gameboard, int nRows, int nCols,
 	/*set seed of rand() to time so that its repeatedly getting reseeded, rand() used in getRandom() for
 	random number generation within ranges*/
 	srand(time(0));
+
+	/*In case the gameboard was used before, cleans it of previous letters and symbos
+	 so that it does not affect the new initialization */
+	for(j = 0; j < nRows; j++) {
+		for(i = 0; i < nCols; i++)
+			gameboard[j][i] = '\0';
+	}
 	
 	FrequencyCount(FC, aEntries, nElem);
 	
@@ -680,13 +865,139 @@ play(arrMatrix gameboard, int nRows, int nCols,
           wordList aEntries, int nElem)
 {
 	int bOver = 0;
+	char letterInput;
+	char cDump;
+	int currentrow = 0;
+	int index;
+	int bFound = 0;
+	int clueIndex;
+	int res;
+	strWord playerAnswer;
+	int bPlay = 1;
+	char input;
+	strWord fname;
+	int test;
 	
-	while(bOver == 0) {
+	do
+	{
+		while(bOver == 0 && letterInput != '0') {
+
+			printf("\nYou may enter the number [0] if you wish to exit the game.\n");
+			printGB(gameboard, nRows, nCols);
+
+			fflush(stdin);
+
+			do 
+			{
+				printf("\nPick a letter from row %d: \n", currentrow + 1);
+				
+				fscanf(stdin,"%c%c", &letterInput, &cDump);
+			
+				if(letterInput != '0')
+					res = isValidLetter(letterInput, gameboard[currentrow], nCols);
+				
+
+				if(res == -1)
+					printf("\nInvalid letter, please pick a letter from the specified row.\n");
+
+				fflush(stdin);
+
+			}while(res == -1 && letterInput != '0');
+
+			while(bFound == 0 && letterInput != '0') {
+					
+					index = getRandom(0, nElem - 1);
+					if(aEntries[index].answer[0] == letterInput && aEntries[index].use == 1) {
+						bFound = 1;
+						aEntries[index].use = 0;
+
+
+					}
+			}
+
+			if(letterInput != '0') {
+				clueIndex = getRandom(0, aEntries[index].numClues - 1);
+
+				printf("\nCLUE - %s: %s\n", aEntries[index].clueList[clueIndex].relation, aEntries[index].clueList[clueIndex].relValue);
+				printf("What word do you think it is?\n");
+				fflush(stdin);
+				getPhraseWord(playerAnswer);
+
+				if(strcmp(playerAnswer, aEntries[index].answer) == 0) {
+					printf("\nCorrect!\n");
+					
+					gameboard[currentrow][res] = '*';
+
+					currentrow++;
+
+				} else {
+					printf("\nWrong!\n");
+					gameboard[currentrow][res] = '-';
+				}
+			}
+
+
+
+			bFound = 0;
+			
+			bOver = IsOver(gameboard, nRows, nCols);
+
+			//if(letterInput == '0');
+			//	bOver = -1;
+		}
 		
 		
+		if(bOver == 1) {
+			printf("\nCongratulations, you won the game!\n");
+		} else if (bOver == -1) {
+			printf("\nYou lost, better luck next time!\n");
+		}
 		
-		bOver = IsOver(gameboard, nRows, nCols);
-	}
+		do
+		{
+			printf("\nWould you like to play again? [Y] or [N]:\n");
+			scanf("%c%c", &input, &cDump);
+
+		}while(!(input == 'y' || input == 'Y' || input == 'N' || input == 'n'));
+
+		if(input == 'y' || input == 'Y') {
+
+			bOver = 0;
+			if(letterInput == '0')
+				letterInput = '1';
+			currentrow = 0;
+
+			do
+			{
+				printf("How many rows for the board? ");
+				scanf("%d", &nRows);
+				printf("How many columns for the board? ");
+				scanf("%d%c", &nCols, &cDump);
+					
+				printf("Enter filename for source of trivia: ");
+				scanf("%s", fname);
+				import(fname, aEntries, &nElem);
+					
+				test = initBoard(gameboard, nRows, nCols, aEntries, nElem);
+				printf("********TEST: ******%d\n", test);
+				
+
+			} while (test == 0 || !(nRows > 0 && nRows <= 10) ||
+				         !(nCols > 0 && nCols <= 10));
+			
+			
+
+		} else {
+			bPlay = 0;
+
+		}
+	
+	
+
+
+	}while(bPlay == 1);
+
+	fflush(stdin);
 	
 }
 
@@ -696,8 +1007,15 @@ play(arrMatrix gameboard, int nRows, int nCols,
 */
 void maintenance()
 {
+	wordList aEntries;
+	strWord word;
+	strWord filename; //CAN BE CHANGED, since strWord only has 21 chars
+
+	int nElem = 0;
 	int bRun = 1;
 	int choice;
+	char cDump;
+	int res;
 	
 	while(bRun == 1) {
 		
@@ -713,7 +1031,7 @@ void maintenance()
 		printf("[8] Export\n");
 		printf("[9] Import\n");
 		printf("\nPlease enter a number corresponding to the action you would like to do: ");
-		scanf("%d", &choice);
+		scanf("%d%c", &choice, &cDump);
 		
 		switch(choice) {
 			
@@ -724,15 +1042,98 @@ void maintenance()
 			}
 			case 1:
 			{
+				addWord(aEntries, &nElem);
 				
 				break;
 				
 			}
 			case 2:
 			{
+				fprintf(stdout, "\nPlease enter the word you would like to add trivia to: ");
+				getPhraseWord(word);
+
+				res = searchWord(word, aEntries, nElem);
+
+				if(res != -1) {
+					addTrivia(&aEntries[res]);
+				} else {
+					fprintf(stdout,"\nUnable to add trivia since this word does not exist.\n");
+
+				}
+
 				
 				break;
 				
+			}
+			case 3:
+			{
+				printf("\nLIST OF ALL WORDS: \n");
+				sortEntries(aEntries, nElem);
+				listWords(aEntries, nElem);
+				printf("\nPlease enter the word whose contents you would like to modify: ");
+				getPhraseWord(word);
+
+				res = searchWord(word, aEntries, nElem);
+				if(res != -1) {
+					modifyEntryChoice(&aEntries[res], aEntries, nElem);
+				} else {
+					printf("\nUnable to modify since the word does not exist.\n");
+				}
+
+				break;
+			}
+			case 4:
+			{
+				printf("\nLIST OF ALL WORDS: \n");
+				sortEntries(aEntries, nElem);
+				listWords(aEntries, nElem);
+
+				deleteWord(aEntries, &nElem);
+
+
+				break;
+			}
+			case 5:
+			{
+				printf("\nLIST OF ALL WORDS: \n");
+				sortEntries(aEntries, nElem);
+				listWords(aEntries, nElem);
+
+				deleteClue(aEntries, nElem);
+				break;
+
+			}
+			case 6:
+			{
+				sortEntries(aEntries, nElem);
+				viewWords(aEntries, nElem);
+
+				break;
+			}
+			case 7:
+			{
+				viewClues(aEntries, nElem);
+
+
+
+				break;
+			}
+			case 8:
+			{
+				fprintf(stdout, "\nPlease enter the file name of the file you would like to export data to: ");
+				fscanf(stdin, "%s", filename);
+				export(filename, aEntries, nElem);
+
+				break;
+			}
+			case 9:
+			{
+				fprintf(stdout, "\nPlease enter the file name of the file you would like to import data from: ");
+				fscanf(stdin, "%s", filename);
+				import(filename, aEntries, &nElem);
+
+				break;
+
 			}
 			
 			
@@ -782,7 +1183,7 @@ void
 listWords(wordList aEntries, int nElem)
 {
 	
-	//THIS MAYBE NEEDS TO BE ALPHABETIZED, maybe make a separate function fior that
+	
 	int i;
 	
 	for(i = 0; i < nElem; i++)
@@ -1105,55 +1506,7 @@ modifyEntry(struct triviaTag * oneEntry)
 	
 }
 
-//MAKE FUNC SPECS
-void modifyEntryChoice(struct triviaTag * oneEntry, wordList aEntries, int nElem) {
-	
-	int bInput = 1;
-	int choice;
-	
-	char cDump;
-	int res;
-	strWord repWord;
-	
-	while(bInput == 1) {
-		
-		printf("\n[1]Modify Word\n[2]Modify Clue\n[3]Exit\n");
-	
-		
-		do
-		{
-			printf("\nPlease enter the number of your next action: ");
-			scanf("%d%c", &choice, &cDump);
-			
-		}while(!(choice >= 1 && choice <= 3));
-		
-		if(choice == 1) {
-			printf("\nPlease enter the new word: "); 
-			do
-			{
-				getPhraseWord(repWord);
-				
-				res = searchWord(repWord, aEntries, nElem);
-				
-				
-				if(res != -1) 
-					printf("\nThe word you entered already exists, please enter a new word.\n");
-				
-				
-			}while(res != -1);
-			
-			
-			
-			strcpy(oneEntry->answer, repWord);
-			printf("The word has been successfully replaced: %s", oneEntry->answer);
-		} else if (choice == 2) {
-			
-			modifyEntry(oneEntry);
-		} else if (choice == 3)
-			bInput = 0;
-	
-	}
-}
+
 
 /* This function will ask the user to input the word (or phrase)
    that will be deleted.  Calls to other functions, like 
@@ -1334,82 +1687,9 @@ displayAllClues(arrClues aList, int numClues)
 	}
 }
 
-/* 
-		MAKE FUNC SPECS FOR THIS
-		
 
-*/
-void viewClues(wordList aEntries, int nElem)
-{
-	
-	strWord input;
-	int res;
-	
-	printf("\nLIST OF WORDS: \n");
-	listWords(aEntries, nElem);
-	
-	do
-	{
-		printf("\n\nPlease enter the word you would like to view the clues of: ");
-		getPhraseWord(input);
-		
-		res = searchWord(input, aEntries, nElem);
-		
-	if(res == -1)
-		printf("\nThe word you entered does not exist in the list, please enter a word that is in the list above.");
-	}while(res == -1);
-	
-	fflush(stdin);
-	
-	viewEntry(aEntries[res]);
-	
-	
-}
 
-/*Make func specs */
-void 
-deleteClue(wordList aEntries, int nElem)
-{
-	int res = -1;
-	int choice, j;
-	strWord word;
 
-	while(res == -1) {
-		printf("\nPlease enter the word whose clue/s you would like to delete: ");
-		getPhraseWord(word);
-
-		res = searchWord(word, aEntries, nElem);
-
-		if(res == -1)
-		printf("\nThe word does not exist, please enter another word.\n");
-	}
-
-	printf("\n");
-
-	if(aEntries[res].numClues > 1) {
-		viewEntry(aEntries[res]);
-		
-		do
-		{
-			printf("\nPlease enter the number of the clue you would like to delete: ");
-			scanf("%d", &choice);
-		}while(!(choice >= 1 && choice <= aEntries[res].numClues));
-
-		choice--;
-
-		aEntries[res].numClues--;
-
-		for(j = choice; j < aEntries[res].numClues; j++) {
-			aEntries[res].clueList[j] = aEntries[res].clueList[j + 1];
-		}
-	} else {
-
-		printf("\nUnable to delete any clues for this word since this word only has one clue.");
-		printf("You may only modify or add clues to this word.\n");
-
-	}
-
-}
 
 /* Given the filename stored in fname, this function
    overwrites the contents of the text file with the contents 
@@ -1459,7 +1739,7 @@ sortEntries(wordList aEntries, int nElem)
 	int i;
 	int j;
 	int min;
-	strWord temp;
+	struct triviaTag tempTrivia;
 	
 	if(nElem > 0) {
 		
@@ -1479,9 +1759,9 @@ sortEntries(wordList aEntries, int nElem)
 				
 			}
 			
-			strcpy(temp, aEntries[i].answer);
-			strcpy(aEntries[i].answer, aEntries[min].answer);
-			strcpy(aEntries[min].answer, temp);
+			tempTrivia = aEntries[i];
+			aEntries[i] = aEntries[min];
+			aEntries[min] = tempTrivia;
 		}
 	}
 	

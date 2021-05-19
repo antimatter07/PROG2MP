@@ -27,7 +27,8 @@ students and/or persons.
 	(including spaces) until a newline is encountered (user presses enter). Used for getting
 	input with a type strWord when spaces are possible.
 
-	@param answer - the string (character array) where user input goes to
+	@param answer - the string (character array) where user input goes to, declared in the function	
+					it will be used in
 
  */
 void 
@@ -83,6 +84,7 @@ modifyEntryChoice(struct triviaTag * oneEntry, wordList aEntries, int nElem) {
 			
 		}while(!(choice >= 1 && choice <= 3));
 		
+		//Check if word user entered is identical to any other word in aEntries
 		if(choice == 1) {
 			printf("\nPlease enter the new word: "); 
 			do
@@ -113,9 +115,10 @@ modifyEntryChoice(struct triviaTag * oneEntry, wordList aEntries, int nElem) {
 /*
 	Counts the amount of instances of each letter as a starting letter of each word in
 	the array of trivia. The count of apital letters are in index 0 - 25, while small letters are in 
-	index 26 - 52. (i.e. if 6 words in aEntries start with 'A', then index 0 of FC[] contains 6);
+	index 26 - 52. (i.e. if 6 words in aEntries start with 'A', then index 0 of FC[] contains 6 after executing
+	this function);
 
-	@param FC - 1D array of ints containing the count of each number.
+	@param FC - 1D array of ints containing the count of each letter.
 	@param aEntries - the array of trivias, aEntries[x].word are the words being checked/counted
 	@param n - the amount of elements there are in aEntries.
 
@@ -143,14 +146,15 @@ FrequencyCount(int FC[], wordList aEntries, int n)
 		else
 			index = aEntries[j].answer[0] - 71;
 		
-		/*Capital letters are in index 0 - 25, while small letters are in index 26 - 51 */
+		/*Count of capital letters are in index 0 - 25, while small letters are in index 26 - 51 */
 		FC[index] = FC[index] + 1;
 	}
 
 
 }
 /*
-	Returns 1 if all elements are used, 0 otherwise.
+	Returns 1 if all elements are used (the struct member aEntries[x].use is an int
+	containing 1), 0 otherwise.
 
 	@param aEntries - array of trivia
 	@param nElem - amount of elements in aEntries
@@ -184,7 +188,8 @@ isAllUsed(wordList aEntries, int nElem) {
  :
  Return value: int, the random number the function has generated within the range
 */
-int getRandom(int nLower, int nUpper)
+int 
+getRandom(int nLower, int nUpper)
 {
 	int nRandom;
 	int nIncUpper; //inclusive upper
@@ -199,14 +204,15 @@ int getRandom(int nLower, int nUpper)
 	return nRandom;
 }
 /*
-		Finds the letter that should be prioritized in the initialization of the gameboar, the starting letter
+		Finds the letter that should be prioritized in the initialization of the gameboard, the starting letter
 		with the highest count. Returns the index of this letter. 
 
 		@param A - array of counts of each starting letter found by FrequencyCount()
 		@param n - amount of elements in A
 
   */
-int findMax(int A[], int n)
+int 
+findMax(int A[], int n)
 {
 	int j;
 	int max = 0;
@@ -229,7 +235,8 @@ int findMax(int A[], int n)
 
 */
 
-void printGB(arrMatrix gameboard, int nRows, int nCols)
+void 
+printGB(arrMatrix gameboard, int nRows, int nCols)
 {
 	
 	int j, i;
@@ -350,9 +357,9 @@ deleteClue(wordList aEntries, int nElem)
 	returns the index once the key is found. If the key is not present in the array, the
 	function returns -1;
 	
-	@param row - A row in the gameboard 
-	@param nCols - The amount of columns each row has in the gameboard
-	@param key - The character being searched for.
+	@param row - A 1D array of ints
+	@param nCols - The amount of elements in the array
+	@param key - The int being searched for.
 
 */
 int 
@@ -462,7 +469,7 @@ bIsYN(char c)
 }
 /*
    Finds the index of the letter with the highest count (like findMax) with respect to the previous max since 
-   the max can't repeat for each (each letter in a row has to be unique). 
+   the max can't repeat for each row(each letter in a row has to be unique). 
 
    @param A - the array containing the counts of each letter. indeces 0-25 have the counts of letters A-Z while 26-51
 			  contains the counts for letters a-z.
@@ -483,7 +490,7 @@ findMaxPrev(int A[], int prevMax[], int n, int nElemPrevMax)
 	for(j = 1; j < n; j++) {
 
 		/*If A[j] contains a count that is higher than the current max and its a letter that is not used
-		in the current row of the gameboard, then the current index should be the new max. */
+		in the current row of the gameboard, then the current index (j) should be the new max. */
 		if(A[j] > A[max] && SearchInt(prevMax, nElemPrevMax, j) == -1 && A[j] > 0)
 			max = j;
 		
@@ -1151,6 +1158,9 @@ play(arrMatrix gameboard, int nRows, int nCols,
 	char input;
 	strWord fname;
 	int test;
+
+	//reseeding to clock to make getRandom() more random
+	srand(time(NULL));
 	
 	do
 	{
@@ -1421,12 +1431,6 @@ void maintenance()
 				break;
 
 			}
-			
-			
-			
-			
-			
-			
 			default: printf("Invalid number, please only pick numbers from 0 to 9.");
 			
 		}
@@ -1502,7 +1506,8 @@ addWord(wordList aEntries, int * pElem)
 		getPhraseWord(answer);
 		
 		fflush(stdin);
-		
+
+		/*Takes user input until user enters a valid word that does not already exist. */
 		if(searchWord(answer, aEntries, *pElem) == -1) {
 			strcpy(aEntries[*pElem].answer, answer);
 			
